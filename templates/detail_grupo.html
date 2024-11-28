@@ -1,0 +1,12 @@
+<h1>{{grupo.nome}}</h1>
+<h2>{{grupo.codigo}}</h2>
+
+
+{% for participante in grupo__participantes %}
+<p>{{participante.nome}}</p>
+{% endfor %}
+
+<div>
+    <a href=" {% url "update_grupo" grupo.pk%} ">Renomear grupo</a>
+    <a href=" {% url "delete_grupo" grupo.pk%} ">Excluir grupo</a>
+</div>
