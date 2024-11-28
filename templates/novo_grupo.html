@@ -1,9 +1,15 @@
 <h1>Novo Grupo</h1>
 
+{% for grupo in grupo_list %}
+    <div>
+        {{ grupo.nome }}
+        {{ grupo.codigo }}
+    </div>
+{% endfor %}
+
 <form action="" method="post">{% csrf_token %}
-    {{ form.as_p }}
+    {{ grupo_form.as_p }}
     <button type="submit">Criar Grupo</button>
 </form>
-
 <br>
 
