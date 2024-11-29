@@ -1,9 +1,15 @@
 <h1>{{grupo.nome}}</h1>
 <h2>{{grupo.codigo}}</h2>
 
+<h3>Adicionar novo participante</h3>
+<form action="" method="post">{% csrf_token %}
+    {{add_participante_form.as_p}}
+    <button type="submit">Adicionar</button>
+</form>
 
-{% for participante in grupo__participantes %}
-<p>{{participante.nome}}</p>
+{% for participante in participante_list %}
+    <p><strong>Nome:</strong> {{participante.nome}}</p>
+    <p><strong>Telefone:</strong> {{participante.telefone}}</p>
 {% endfor %}
 
 <div>

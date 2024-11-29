@@ -6,3 +6,8 @@ class NovoGrupoForm(ModelForm):
         model = Grupo
         fields = ('nome',)
         
+class AddParticipanteForm(ModelForm):
+    class Meta:
+        model = Participante
+        fields = ('nome','telefone',)
+        
