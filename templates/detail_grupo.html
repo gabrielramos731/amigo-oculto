@@ -7,9 +7,11 @@
     <button type="submit">Adicionar</button>
 </form>
 
-{% for participante in participante_list %}
+{% for participante in participantes_list %}
     <p><strong>Nome:</strong> {{participante.nome}}</p>
     <p><strong>Telefone:</strong> {{participante.telefone}}</p>
+    <div><a href=" {% url "update_participante" grupo.pk participante.pk%} ">Editar</a></div>
+    <div><a href=" {% url "delete_participante" grupo.pk participante.pk%} ">Excluir</a></div>
 {% endfor %}
 
 <div>

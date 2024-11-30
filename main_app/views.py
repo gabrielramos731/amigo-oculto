@@ -17,14 +17,6 @@ class CriarNovoGrupo(View):
         view = CriarNovoGrupoPost.as_view()
         return view(request, *args, **kwargs)
 
-class CriarNovoGrupoPost(CreateView):
-    model = Grupo
-    template_name = 'novo_grupo.html'
-    fields = ['nome',]
-
-    def get_success_url(self):
-        return reverse('detail_grupo', kwargs={'pk': self.object.pk})
-    
 class CriarNovoGrupoGet(ListView):
     model = Grupo
     template_name = 'novo_grupo.html'
@@ -33,6 +25,14 @@ class CriarNovoGrupoGet(ListView):
         context = super().get_context_data(**kwargs)
         context["grupo_form"] = NovoGrupoForm()
         return context
+
+class CriarNovoGrupoPost(CreateView):
+    model = Grupo
+    template_name = 'novo_grupo.html'
+    fields = ['nome',]
+
+    def get_success_url(self):
+        return reverse('detail_grupo', kwargs={'pk': self.object.pk})
 
 class GrupoUpdateView(UpdateView):
     model = Grupo
@@ -68,9 +68,6 @@ class GrupoDetailGet(DetailView):
         context["participantes_list"] = Participante.objects.filter(grupo=self.kwargs['pk'])
         return context
     
-    def get_queryset(self):
-        return super().get_queryset()
-    
 class GrupoDetailPost(CreateView):
     model = Participante
     template_name = 'detail_grupo.html'
@@ -84,3 +81,26 @@ class GrupoDetailPost(CreateView):
         participante.grupo = Grupo.objects.get(pk=self.kwargs['pk'])
         form.save()
         return super().form_valid(form)
+
+class UpdateParticipanteView(UpdateView):
+    model = Participante
+    template_name = 'update_participante.html'
+    fields = ['nome','telefone']
+    
+    def get_object(self, queryset=None):
+        participante_id = self.kwargs['pk_part']
+        return Participante.objects.get(id=participante_id)
+    
+    def get_success_url(self):
+        return reverse_lazy('detail_grupo', kwargs={'pk': self.kwargs['pk_grupo']})
+
+class DeleteParticipanteView(DeleteView):
+    model = Participante
+    template_name = 'delete_participante.html'
+    
+    def get_object(self, queryset = None):
+        return Participante.objects.get(id=self.kwargs['pk_part'])
+    
+    def get_success_url(self):
+        return reverse_lazy('detail_grupo', kwargs={'pk': self.kwargs['pk_grupo']})
+    
