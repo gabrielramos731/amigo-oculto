@@ -5,10 +5,15 @@ from django.views.generic import (ListView,
                                   UpdateView,
                                   DeleteView)
 from django.urls import reverse_lazy, reverse
+from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Grupo, Participante
 from .forms import NovoGrupoForm, AddParticipanteForm
 
-class CriarNovoGrupo(View):
+class HomeView(ListView):
+    template_name = 'home.html'
+    model = Grupo
+    
+class CriarNovoGrupo(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         view = CriarNovoGrupoGet.as_view()
         return view(request, *args, **kwargs)
@@ -34,7 +39,7 @@ class CriarNovoGrupoPost(CreateView):
     def get_success_url(self):
         return reverse('detail_grupo', kwargs={'pk': self.object.pk})
 
-class GrupoUpdateView(UpdateView):
+class GrupoUpdateView(LoginRequiredMixin, UpdateView):
     model = Grupo
     template_name = 'update_grupo.html'
     fields = ['nome']
@@ -42,14 +47,14 @@ class GrupoUpdateView(UpdateView):
     def get_success_url(self):
         return reverse('detail_grupo', kwargs={'pk': self.object.pk})
     
-class GrupoDeleteView(DeleteView):
+class GrupoDeleteView(LoginRequiredMixin, DeleteView):
     model = Grupo
     template_name = 'delete_grupo.html'
 
     def get_success_url(self):
         return reverse('novo_grupo')
 
-class GrupoDetailView(View):
+class GrupoDetailView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         view = GrupoDetailGet.as_view()
         return view(request, *args, **kwargs)
@@ -82,7 +87,7 @@ class GrupoDetailPost(CreateView):
         form.save()
         return super().form_valid(form)
 
-class UpdateParticipanteView(UpdateView):
+class UpdateParticipanteView(LoginRequiredMixin, UpdateView):
     model = Participante
     template_name = 'update_participante.html'
     fields = ['nome','telefone']
@@ -94,7 +99,7 @@ class UpdateParticipanteView(UpdateView):
     def get_success_url(self):
         return reverse_lazy('detail_grupo', kwargs={'pk': self.kwargs['pk_grupo']})
 
-class DeleteParticipanteView(DeleteView):
+class DeleteParticipanteView(LoginRequiredMixin, DeleteView):
     model = Participante
     template_name = 'delete_participante.html'
     

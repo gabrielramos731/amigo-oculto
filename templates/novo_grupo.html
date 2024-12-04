@@ -1,3 +1,5 @@
+{% include "block_auth.html" %}
+
 <h1>Novo Grupo</h1>
 <form action="" method="post">{% csrf_token %}
     {{ grupo_form.as_p }}

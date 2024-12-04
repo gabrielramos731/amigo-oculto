@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     
-    'main_app.apps.MainAppConfig'
+    'main_app.apps.MainAppConfig',
+    'contas.apps.ContasConfig',
 ]
 
 MIDDLEWARE = [
@@ -124,4 +125,5 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-LOGIN_REDIRECT_URL = "/"
+LOGIN_REDIRECT_URL = "novo_grupo"
+LOGOUT_REDIRECT_URL = "/"

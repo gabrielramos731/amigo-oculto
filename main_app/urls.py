@@ -1,5 +1,6 @@
-from django.urls import path
-from .views import (CriarNovoGrupo,
+from django.urls import path, include
+from .views import (HomeView,
+                    CriarNovoGrupo,
                     GrupoDetailView,
                     GrupoUpdateView,
                     GrupoDeleteView,
@@ -8,7 +9,8 @@ from .views import (CriarNovoGrupo,
                     )
 
 urlpatterns = [
-    path('', CriarNovoGrupo.as_view(), name='novo_grupo'),
+    path('', HomeView.as_view(), name='home'),
+    path('grupo/', CriarNovoGrupo.as_view(), name='novo_grupo'),
     path('<int:pk>/', GrupoDetailView.as_view(), name='detail_grupo'),
     path('<int:pk>/renomear', GrupoUpdateView.as_view(), name='update_grupo'),
     path('<int:pk>/deletar', GrupoDeleteView.as_view(), name='delete_grupo'),
