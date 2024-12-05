@@ -1,13 +1,12 @@
-from django.forms import ModelForm
+from django import forms
 from .models import Grupo, Participante
 
-class NovoGrupoForm(ModelForm):
+class NovoGrupoForm(forms.ModelForm):
     class Meta:
         model = Grupo
-        fields = ('nome',)
+        fields = ['nome']
         
-class AddParticipanteForm(ModelForm):
+class AddParticipanteForm(forms.ModelForm):
     class Meta:
         model = Participante
-        fields = ('nome','telefone',)
-        
+        fields = ['nome','telefone']

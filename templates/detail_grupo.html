@@ -4,8 +4,9 @@
 <h2>{{grupo.codigo}}</h2>
 
 <h3>Adicionar novo participante</h3>
-<form action="" method="post">{% csrf_token %}
+<form action="" method="post" onsubmit="return valida_telefone()">{% csrf_token %}
     {{add_participante_form.as_p}}
+    <div id="error-div" style="color: red;"></div>
     <button type="submit">Adicionar</button>
 </form>
 
@@ -20,3 +21,17 @@
     <a href=" {% url "update_grupo" grupo.pk%} ">Renomear grupo</a>
     <a href=" {% url "delete_grupo" grupo.pk%} ">Excluir grupo</a>
 </div>
+
+
+<script>
+    function valida_telefone(){
+        var telefone = document.getElementById('id_telefone').value;
+        var errorDiv = document.getElementById('error-div');
+        if(telefone.length < 11){
+            errorDiv.textContent = "O telefone deve  conter 11 dígitos.";
+            return false;
+        }
+        errorDiv.textContent = '';
+        return true
+    }
+</script>

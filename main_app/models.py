@@ -1,6 +1,7 @@
 from django.db import models
+from django.core.validators import MinLengthValidator
 from django.contrib.auth import get_user_model
-from django.core.validators import MinLengthValidator, MaxLengthValidator
+
 class Grupo(models.Model):
     nome = models.CharField(max_length=50)
     codigo = models.CharField(max_length=6, null=True)

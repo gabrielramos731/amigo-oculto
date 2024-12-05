@@ -69,14 +69,14 @@ class GrupoDetailGet(DetailView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["add_participante_form"] = AddParticipanteForm()
+        context["add_participante_form"] = AddParticipanteForm
         context["participantes_list"] = Participante.objects.filter(grupo=self.kwargs['pk'])
         return context
     
 class GrupoDetailPost(CreateView):
     model = Participante
     template_name = 'detail_grupo.html'
-    fields = ['nome','telefone']
+    form_class = AddParticipanteForm
     
     def get_success_url(self):
         return reverse('detail_grupo', kwargs={'pk': self.kwargs['pk']})
@@ -90,7 +90,7 @@ class GrupoDetailPost(CreateView):
 class UpdateParticipanteView(LoginRequiredMixin, UpdateView):
     model = Participante
     template_name = 'update_participante.html'
-    fields = ['nome','telefone']
+    form_class = AddParticipanteForm
     
     def get_object(self, queryset=None):
         participante_id = self.kwargs['pk_part']
