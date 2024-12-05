@@ -6,6 +6,7 @@ from .views import (HomeView,
                     GrupoDeleteView,
                     UpdateParticipanteView,
                     DeleteParticipanteView,
+                    SignUpView,
                     )
 
 urlpatterns = [
@@ -16,4 +17,5 @@ urlpatterns = [
     path('<int:pk>/deletar', GrupoDeleteView.as_view(), name='delete_grupo'),
     path('<int:pk_grupo>/atualizar_participante/<int:pk_part>', UpdateParticipanteView.as_view(), name='update_participante'),
     path('<int:pk_grupo>/deletar_participante/<int:pk_part>', DeleteParticipanteView.as_view(), name='delete_participante'),
+    path('signup', SignUpView.as_view(), name='signup'),
 ]

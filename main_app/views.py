@@ -1,3 +1,6 @@
+from django.db.models.query import QuerySet
+from django.forms import BaseModelForm
+from django.http import HttpResponse
 from django.views.generic import (ListView,
                                   CreateView,
                                   View,
@@ -6,6 +9,7 @@ from django.views.generic import (ListView,
                                   DeleteView)
 from django.urls import reverse_lazy, reverse
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth import forms
 from .models import Grupo, Participante
 from .forms import NovoGrupoForm, AddParticipanteForm
 
@@ -30,11 +34,20 @@ class CriarNovoGrupoGet(ListView):
         context = super().get_context_data(**kwargs)
         context["grupo_form"] = NovoGrupoForm()
         return context
+    
+    def get_queryset(self) -> QuerySet[Grupo]:
+        return Grupo.objects.filter(admin=self.request.user).only('nome')
 
 class CriarNovoGrupoPost(CreateView):
     model = Grupo
     template_name = 'novo_grupo.html'
     fields = ['nome',]
+
+    def form_valid(self, form: BaseModelForm) -> HttpResponse:
+        obj = form.save(commit=False)
+        obj.admin = self.request.user
+        form.save()
+        return super().form_valid(form)
 
     def get_success_url(self):
         return reverse('detail_grupo', kwargs={'pk': self.object.pk})
@@ -108,4 +121,10 @@ class DeleteParticipanteView(LoginRequiredMixin, DeleteView):
     
     def get_success_url(self):
         return reverse_lazy('detail_grupo', kwargs={'pk': self.kwargs['pk_grupo']})
+    
+class SignUpView(CreateView):
+    model = forms.UserModel
+    template_name = 'registration/signup.html'
+    form_class = forms.UserCreationForm
+    success_url = reverse_lazy("login")
     

@@ -10,7 +10,7 @@
 {% for grupo in grupo_list %}
     <div>
         <a href=" {% url "detail_grupo" grupo.id %} ">{{ grupo.nome }}</a>
-        {{ grupo.codigo }}
+        <span>{{ grupo.codigo }}</span>
     </div>
 {% endfor %}
 <br>
