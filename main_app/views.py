@@ -10,6 +10,7 @@ from django.views.generic import (ListView,
 from django.urls import reverse_lazy, reverse
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import forms
+from django.contrib.auth.mixins import UserPassesTestMixin
 from .models import Grupo, Participante
 from .forms import NovoGrupoForm, AddParticipanteForm
 
@@ -21,6 +22,9 @@ class CriarNovoGrupo(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         view = CriarNovoGrupoGet.as_view()
         return view(request, *args, **kwargs)
+    
+    def get_login_url(self) -> str:
+        return reverse('login')
     
     def post(self, request, *args, **kwargs):
         view = CriarNovoGrupoPost.as_view()
@@ -60,23 +64,32 @@ class GrupoUpdateView(LoginRequiredMixin, UpdateView):
     def get_success_url(self):
         return reverse('detail_grupo', kwargs={'pk': self.object.pk})
     
+    def get_login_url(self) -> str:
+        return reverse('login')
+    
 class GrupoDeleteView(LoginRequiredMixin, DeleteView):
     model = Grupo
     template_name = 'delete_grupo.html'
 
     def get_success_url(self):
         return reverse('novo_grupo')
+    
+    def get_login_url(self) -> str:
+        return reverse('login')
 
 class GrupoDetailView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         view = GrupoDetailGet.as_view()
         return view(request, *args, **kwargs)
+
+    def get_login_url(self) -> str:
+        return reverse('login')
     
     def post(self, request, *args, **kwargs):
         view = GrupoDetailPost.as_view()
         return view(request, *args, **kwargs)
     
-class GrupoDetailGet(DetailView):
+class GrupoDetailGet(UserPassesTestMixin ,DetailView):
     model = Grupo
     template_name = 'detail_grupo.html'
     
@@ -85,6 +98,10 @@ class GrupoDetailGet(DetailView):
         context["add_participante_form"] = AddParticipanteForm
         context["participantes_list"] = Participante.objects.filter(grupo=self.kwargs['pk'])
         return context
+    
+    def test_func(self) -> bool | None:
+        admin = self.get_object()
+        return admin.admin == self.request.user
     
 class GrupoDetailPost(CreateView):
     model = Participante
@@ -111,6 +128,9 @@ class UpdateParticipanteView(LoginRequiredMixin, UpdateView):
     
     def get_success_url(self):
         return reverse_lazy('detail_grupo', kwargs={'pk': self.kwargs['pk_grupo']})
+    
+    def get_login_url(self) -> str:
+        return reverse('login')
 
 class DeleteParticipanteView(LoginRequiredMixin, DeleteView):
     model = Participante
@@ -122,9 +142,11 @@ class DeleteParticipanteView(LoginRequiredMixin, DeleteView):
     def get_success_url(self):
         return reverse_lazy('detail_grupo', kwargs={'pk': self.kwargs['pk_grupo']})
     
+    def get_login_url(self) -> str:
+        return reverse('login')
+    
 class SignUpView(CreateView):
     model = forms.UserModel
     template_name = 'registration/signup.html'
     form_class = forms.UserCreationForm
     success_url = reverse_lazy("login")
-    
