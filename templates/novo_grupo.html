@@ -1,3 +1,5 @@
+{% load custom_filters %}
+
 {% include "block_auth.html" %}
 
 <h1>Novo Grupo</h1>
@@ -9,7 +11,7 @@
 <h1>Meus Grupos</h1>
 {% for grupo in grupo_list %}
     <div>
-        <a href=" {% url "detail_grupo" grupo.id %} ">{{ grupo.nome }}</a>
+        <a href=" {% url "detail_grupo" encoded_pk=grupo.id|encode_pk %} ">{{ grupo.nome }}</a>
         <span>{{ grupo.codigo }}</span>
     </div>
 {% endfor %}

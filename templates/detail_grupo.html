@@ -1,3 +1,4 @@
+{% load custom_filters %}
 {% include "block_auth.html" %}
 
 <h1>{{grupo.nome}}</h1>
@@ -13,13 +14,13 @@
 {% for participante in participantes_list %}
     <p><strong>Nome:</strong> {{participante.nome}}</p>
     <p><strong>Telefone:</strong> {{participante.telefone}}</p>
-    <div><a href=" {% url "update_participante" grupo.pk participante.pk%} ">Editar</a></div>
-    <div><a href=" {% url "delete_participante" grupo.pk participante.pk%} ">Excluir</a></div>
+    <div><a href=" {% url "update_participante" grupo.pk|encode_pk participante.pk|encode_pk%} ">Editar</a></div>
+    <div><a href=" {% url "delete_participante" grupo.pk|encode_pk participante.pk|encode_pk%} ">Excluir</a></div>
 {% endfor %}
 
 <div>
-    <a href=" {% url "update_grupo" grupo.pk%} ">Renomear grupo</a>
-    <a href=" {% url "delete_grupo" grupo.pk%} ">Excluir grupo</a>
+    <a href=" {% url "update_grupo" grupo.pk|encode_pk%} ">Renomear grupo</a>
+    <a href=" {% url "delete_grupo" grupo.pk|encode_pk%} ">Excluir grupo</a>
 </div>
 
 
