@@ -11,6 +11,10 @@
     <button type="submit">Adicionar</button>
 </form>
 
+<form action=" {% url "sorteio" grupo.pk|encode_pk %} " method="post">{% csrf_token %}
+    <button type="submit">Gerar Sorteio</button>
+</form>
+
 {% for participante in participantes_list %}
     <p><strong>Nome:</strong> {{participante.nome}}</p>
     <p><strong>Telefone:</strong> {{participante.telefone}}</p>

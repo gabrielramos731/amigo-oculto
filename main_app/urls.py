@@ -7,6 +7,7 @@ from .views import (HomeView,
                     UpdateParticipanteView,
                     DeleteParticipanteView,
                     SignUpView,
+                    geraSorteio,
                     )
 
 urlpatterns = [
@@ -18,4 +19,5 @@ urlpatterns = [
     path('<str:encoded_pk_grupo>/atualizar_participante/<str:encoded_pk_part>', UpdateParticipanteView.as_view(), name='update_participante'),
     path('<str:encoded_pk_grupo>/deletar_participante/<str:encoded_pk_part>', DeleteParticipanteView.as_view(), name='delete_participante'),
     path('signup', SignUpView.as_view(), name='signup'),
+    path('sorteio/<str:encoded_pk>', geraSorteio, name='sorteio'),
 ]

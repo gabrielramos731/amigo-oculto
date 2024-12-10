@@ -1,8 +1,8 @@
-import base64
+import base64, random
 from django.db.models.query import QuerySet
 from django.forms import BaseModelForm
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from django.views.generic import (ListView,
                                   CreateView,
                                   View,
@@ -171,3 +171,19 @@ class SignUpView(CreateView):
     template_name = 'registration/signup.html'
     form_class = forms.UserCreationForm
     success_url = reverse_lazy("login")
+
+def geraSorteio(request, encoded_pk):
+    grupo_pk = decode_pk(encoded_pk)
+    grupo = Grupo.objects.get(pk=grupo_pk)
+    participantes = Participante.objects.filter(grupo=grupo_pk)
+    participantes_id = list(participantes.values_list('id', flat=True))
+    i=0
+    for item in participantes:
+        id_sorteado = random.sample(participantes_id, 1)[0]
+        while id_sorteado == item.id:
+            i+=1
+            id_sorteado = random.sample(participantes_id, 1)[0]
+        item.codigo_match = Participante.objects.get(pk=id_sorteado)
+        participantes_id.remove(id_sorteado)
+    
+    return render(request, 'sorteio.html', {'grupo': grupo, 'participantes': participantes, 'count':i})

@@ -20,7 +20,8 @@ class Participante(models.Model):
                               on_delete=models.CASCADE,
                               null=True,
                               related_name='participante')
-    codigo_match = models.IntegerField(null=True)
+    codigo_match = models.OneToOneField("self", null=True, on_delete=models.SET_NULL)
+    
     
     def __str__(self):
         return self.nome
