@@ -21,6 +21,7 @@ class HomeView(ListView):
     template_name = 'home.html'
     model = Grupo
     
+    
 class CriarNovoGrupo(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         view = CriarNovoGrupoGet.as_view()
@@ -176,14 +177,26 @@ def geraSorteio(request, encoded_pk):
     grupo_pk = decode_pk(encoded_pk)
     grupo = Grupo.objects.get(pk=grupo_pk)
     participantes = Participante.objects.filter(grupo=grupo_pk)
+    participantes.update(codigo_match=None)
     participantes_id = list(participantes.values_list('id', flat=True))
-    i=0
     for item in participantes:
+        if len(participantes_id) == 1 and participantes_id[0] == item.id:
+            item.codigo_match = Participante.objects.get(pk=id_sorteado)
+            id_destino = Participante.objects.get(pk=id_sorteado).codigo_match.id
+            obj = Participante.objects.get(pk=id_destino)
+            obj.codigo_match = None
+            obj.save()
+            item.save()
+            obj.codigo_match = item
+            obj.save()
+            break
         id_sorteado = random.sample(participantes_id, 1)[0]
         while id_sorteado == item.id:
-            i+=1
             id_sorteado = random.sample(participantes_id, 1)[0]
+            
         item.codigo_match = Participante.objects.get(pk=id_sorteado)
         participantes_id.remove(id_sorteado)
-    
-    return render(request, 'sorteio.html', {'grupo': grupo, 'participantes': participantes, 'count':i})
+        item.save()
+
+    participantes = Participante.objects.filter(grupo=grupo_pk)
+    return render(request, 'sorteio.html', {'grupo': grupo, 'participantes': participantes})
