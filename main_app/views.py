@@ -1,7 +1,8 @@
-import base64, random
+import random, json
+from pathlib import Path
 from django.db.models.query import QuerySet
 from django.forms import BaseModelForm
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.views.generic import (ListView,
                                   CreateView,
@@ -12,10 +13,12 @@ from django.views.generic import (ListView,
 from django.urls import reverse_lazy, reverse
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import forms
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import UserPassesTestMixin
-from .utils import encode_pk, decode_pk
+from .utils import encode_pk, decode_pk, send_message, get_text_message_input
 from .models import Grupo, Participante
 from .forms import NovoGrupoForm, AddParticipanteForm
+import requests
 
 class HomeView(ListView):
     template_name = 'home.html'
@@ -173,6 +176,7 @@ class SignUpView(CreateView):
     form_class = forms.UserCreationForm
     success_url = reverse_lazy("login")
 
+@login_required(redirect_field_name='') # evita de acessar sorteios
 def geraSorteio(request, encoded_pk):
     grupo_pk = decode_pk(encoded_pk)
     grupo = Grupo.objects.get(pk=grupo_pk)
@@ -200,3 +204,27 @@ def geraSorteio(request, encoded_pk):
 
     participantes = Participante.objects.filter(grupo=grupo_pk)
     return render(request, 'sorteio.html', {'grupo': grupo, 'participantes': participantes})
+
+def wppMessageView(request):
+    config_path = Path(__file__).resolve().parent / 'config.json'
+    with open(config_path, 'r') as file:
+        config_data = json.load(file)
+    
+        headers = {"Content-type": "application/json",
+                "Authorization": f"Bearer {config_data['ACCESS_TOKEN']}"}
+        payload = { "messaging_product": "whatsapp",
+                    "recipient_type": "individual",
+                    "to": config_data['RECIPIENT_WAID'],
+                    "type": "text",
+                    "text": {"body": "Teste teste 1 2 3"}
+                    }   
+        url = f'https://graph.facebook.com/{config_data["VERSION"]}/{config_data["PHONE_NUMBER_ID"]}/messages'
+        response = requests.post(url, headers=headers, json=payload)
+
+        if response.status_code == 200 or response.status_code == 201:
+            return HttpResponseRedirect('grupo')
+        else:
+            return JsonResponse({
+                "error": "Erro ao enviar requisicao",
+                "response": response.json()
+            }, status=response.status_code)

@@ -2,6 +2,10 @@
 
 {% include "block_auth.html" %}
 
+<form action="{% url "welcome" %}" method="post">{% csrf_token %}
+    <button type="submit">Menssagem</button>
+</form>
+
 <h1>Novo Grupo</h1>
 <form action="" method="post">{% csrf_token %}
     {{ grupo_form.as_p }}
