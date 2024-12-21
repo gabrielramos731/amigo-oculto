@@ -1,9 +1,7 @@
-import random, json
+import random, json, requests
 from pathlib import Path
-from django.db.models.query import QuerySet
-from django.forms import BaseModelForm
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-from django.shortcuts import get_object_or_404, render
+from django.http import HttpResponseRedirect, JsonResponse
+from django.shortcuts import get_object_or_404, render, redirect
 from django.views.generic import (ListView,
                                   CreateView,
                                   View,
@@ -11,20 +9,18 @@ from django.views.generic import (ListView,
                                   UpdateView,
                                   DeleteView)
 from django.urls import reverse_lazy, reverse
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import forms
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import UserPassesTestMixin
-from .utils import encode_pk, decode_pk, send_message, get_text_message_input
+from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin
+from django.contrib import messages
+from .utils import encode_pk, decode_pk
 from .models import Grupo, Participante
 from .forms import NovoGrupoForm, AddParticipanteForm
-import requests
 
 class HomeView(ListView):
     template_name = 'home.html'
     model = Grupo
-    
-    
+ 
 class CriarNovoGrupo(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         view = CriarNovoGrupoGet.as_view()
@@ -44,20 +40,26 @@ class CriarNovoGrupoGet(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["grupo_form"] = NovoGrupoForm()
+        context["grupos"] = Grupo.objects.filter(admin=self.request.user).only('nome')
         return context
-    
-    def get_queryset(self) -> QuerySet[Grupo]:
-        return Grupo.objects.filter(admin=self.request.user).only('nome')
 
 class CriarNovoGrupoPost(CreateView):
     model = Grupo
     template_name = 'novo_grupo.html'
     fields = ['nome',]
 
-    def form_valid(self, form: BaseModelForm) -> HttpResponse:
+    def form_valid(self, form):
+        if Grupo.objects.filter(admin=self.request.user).count() >= 3:
+            messages.error(self.request, "Você já criou o número máximo de 3 grupos.")  # cria mensagem e exibe na requisição subsequente
+            return render(self.request, 'novo_grupo.html',{  # renderiza sem recarregar página
+                'grupo_form':NovoGrupoForm(),
+                'grupos':Grupo.objects.filter(admin=self.request.user).only('nome')
+            })
+
         obj = form.save(commit=False)
         obj.admin = self.request.user
-        form.save()
+        obj.save()
+        messages.success(self.request, "Grupo criado com sucesso!")
         return super().form_valid(form)
 
     def get_success_url(self):
