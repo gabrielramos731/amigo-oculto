@@ -1,6 +1,6 @@
 import random, json, requests
 from pathlib import Path
-from django.http import HttpResponseRedirect, JsonResponse
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.views.generic import (ListView,
                                   CreateView,
@@ -136,6 +136,10 @@ class GrupoDetailPost(CreateView):
         return reverse('detail_grupo', kwargs={'encoded_pk': self.kwargs['encoded_pk']})
 
     def form_valid(self, form):
+        if(Participante.objects.filter(grupo=decode_pk(self.kwargs['encoded_pk'])).count() > 60): # add restrição quantidade de participantes
+            messages.error(self.request, "Número máximo de participantes atingido")
+            return redirect('detail_grupo', self.kwargs['encoded_pk'])
+        
         participante = form.save(commit=False)
         participante.grupo = Grupo.objects.get(pk=decode_pk(self.kwargs['encoded_pk']))
         form.save()
@@ -224,7 +228,7 @@ def wppMessageView(request):
         response = requests.post(url, headers=headers, json=payload)
 
         if response.status_code == 200 or response.status_code == 201:
-            return HttpResponseRedirect('grupo')
+            return redirect('grupo')
         else:
             return JsonResponse({
                 "error": "Erro ao enviar requisicao",

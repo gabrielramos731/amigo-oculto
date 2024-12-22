@@ -11,6 +11,14 @@
     <button type="submit">Adicionar</button>
 </form>
 
+{% if messages %}
+    <ul>
+        {% for message in messages %}
+            <p>{{message}}</p>
+        {% endfor %}
+    </ul>
+{% endif %}
+
 <form action=" {% url "sorteio" grupo.pk|encode_pk %} " method="post">{% csrf_token %}
     <button type="submit">Gerar Sorteio</button>
 </form>
@@ -32,8 +40,13 @@
     function valida_telefone(){
         var telefone = document.getElementById('id_telefone').value;
         var errorDiv = document.getElementById('error-div');
-        if(telefone.length < 11){
-            errorDiv.textContent = "O telefone deve  conter 11 dígitos.";
+        const re = new RegExp('^\\d+$')
+        if(telefone.length < 11){  // length verification
+            errorDiv.textContent = "O telefone deve conter 11 dígitos.";
+            return false;
+        }
+        if(!re.test(telefone)){  // regex verification
+            errorDiv.textContent = "O telefone deve conter apenas números.";
             return false;
         }
         errorDiv.textContent = '';
